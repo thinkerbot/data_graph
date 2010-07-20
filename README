@@ -1,10 +1,46 @@
 = DataGraph
 
+Simplified eager loading for ActiveRecord
+
 == Description
+
+The default eager loading mechanism of ActiveRecord has numerous cases where
+these two are not equivalent as you might expect:
+
+  Model.find(:first, :include => :assoc).assoc
+  Model.find(:first).assoc
+
+As a result it gets tricky to make associations that work correctly via
+include. Oftentimes too much data gets returned. DataGraph makes eager loading
+easier by providing a way to declare and load a specific set of associated
+data.
 
 == Usage
 
+DataGraph uses a syntax based on the serialization methods.
+
+  require 'data_graph'
+  graph = Model.data_graph(
+    :only => [:a, :b, :c],
+    :include => {
+      :assoc => {
+        :only => [:x, :y]
+  }})
+  
+  data = graph.find(:first)
+  data.a                       # => 'A'
+  data.assoc.x                 # => 'X'
+  data.assoc.z                 # !> ActiveRecord::MissingAttributeError
+
+Any number of associations may be specified this way, and to any nesting
+depth. DataGraph always uses a 'one query per-association' strategy and never
+reverts to left outer joins the way include sometimes will.
+
 == Installation
+
+DataGraph is available as a gem on {Gemcutter}[http://gemcutter.org/gems/data_graph]
+
+  % gem install data_graph
 
 == Info 
 
