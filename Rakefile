@@ -61,34 +61,14 @@ end
 # Dependency tasks
 #
 
-# Xpromote raises an error if it finds output on stderr. Unfortunately the sh
-# from Rake will print the cmd on stderr, so use this method instead for
-# commands that run during promotion.
-def stdout_sh(cmd)
-  puts cmd
-  system(cmd) or raise("command failed: #{cmd}")
-end
-
-desc 'Checkout submodules'
-task :submodules do
-  output = `git submodule status 2>&1`
-  
-  if output =~ /^-/m
-    puts "Missing submodules:\n#{output}"
-    stdout_sh "git submodule init"
-    stdout_sh "git submodule update"
-    puts
-  end
-end
-
 desc 'Bundle dependencies'
-task :bundle => :submodules do
+task :bundle do
   opts = %w{prd acp qa tst}.include?(ENV['WCIS_ENV']) ? ' --without=development' : ''
   output = `bundle check 2>&1`
   
   unless $?.to_i == 0
     puts output
-    stdout_sh "bundle install#{opts} 2>&1"
+    sh "bundle install#{opts} 2>&1"
     puts
   end
 end
@@ -103,7 +83,7 @@ task :default => :test
 desc 'Run the tests'
 task :test => :bundle do
   tests = Dir.glob('test/**/*_test.rb')
-  sh('ruby', '-w', '-e', 'ARGV.dup.each {|test| load test}', *tests)
+  sh('ruby', '-w', '-I', 'test/models', '-e', 'ARGV.dup.each {|test| load test}', *tests)
 end
 
 desc 'Run the cc tests'
