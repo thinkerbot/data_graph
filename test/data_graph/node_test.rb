@@ -264,25 +264,10 @@ class NodeTest < Test::Unit::TestCase
   # find test
   #
   
-  def test_assumption_that_AR_find_loads_all_attributes_of_an_included_association
-    emp = Emp.find(:first, :include => :job)
-    assert_equal 1, emp.job.id
-    assert_equal 'President', emp.job.name
-  end
-  
   def test_node_loads_only_included_attributes
     emp = Node.new(Emp, :include => {:job => {:only => [:id]}}).find(:first)
     assert_equal 1, emp.job.id
     assert_raises(ActiveRecord::MissingAttributeError) { emp.job.name }
-  end
-  
-  def test_assumption_that_AR_find_only_load_unique_records_for_hmt
-    departments = Job.find(4).departments.collect {|dept| dept.name }
-    assert_equal %w{Research Research Sales Accounting}.sort, departments.sort
-    
-    job = Job.find(4, :include => :departments)
-    departments = job.departments.collect {|dept| dept.name }
-    assert_equal %w{Research Sales Accounting}.sort, departments.sort
   end
   
   def test_find_loads_unique_records_for_hmt
@@ -290,19 +275,6 @@ class NodeTest < Test::Unit::TestCase
     
     departments = job.departments.collect {|dept| dept.name }
     assert_equal %w{Research Sales Accounting}.sort, departments.sort
-  end
-  
-  def test_assumption_that_AR_find_all_has_no_notion_of_unique_records_for_hmt
-    jobs = Job.find(:all, :include => :departments)
-    depts = jobs.collect {|job| job.departments.collect {|dept| dept.name} }
-    
-    assert_equal [
-      ["Accounting"], 
-      ["Research", "Sales", "Accounting"], 
-      ["Research", "Research"], 
-      ["Research", "Research", "Sales", "Accounting"], 
-      ["Sales", "Sales", "Sales", "Sales"]
-    ], depts
   end
   
   def test_find_all_loads_unique_records_for_hmt
