@@ -9,11 +9,11 @@ Gem::Specification.new do |s|
   s.email = 'simon.a.chiang@gmail.com'
   s.homepage = ''
   s.platform = Gem::Platform::RUBY
-  s.summary = ''
+  s.summary = 'Simplified eager loading for ActiveRecord'
   s.require_path = 'lib'
   s.rubyforge_project = ''
   s.has_rdoc = true
-  s.rdoc_options.concat %W{--main README -S -N --title Data\ Graph}
+  s.rdoc_options.concat %W{--main README -S -N --title DataGraph}
   
   # add dependencies
   s.add_dependency('activerecord', '= 2.3.5')

@@ -4,20 +4,20 @@ Simplified eager loading for ActiveRecord
 
 == Description
 
-The default eager loading mechanism of ActiveRecord has numerous cases where
-these two are not equivalent as you might expect:
+The eager loading mechanism of ActiveRecord has {several
+cases}[http://gist.github.com/492409] where these two are not equivalent as
+you might expect:
 
   Model.find(:first, :include => :assoc).assoc
   Model.find(:first).assoc
 
-As a result it gets tricky to make associations that work correctly via
-include. Oftentimes too much data gets returned. DataGraph makes eager loading
-easier by providing a way to declare and load a specific set of associated
-data.
+It's often tricky, although not impossible, to make associations that work
+correctly with include. DataGraph makes eager loading easier by providing a
+straightforward way to declare and load a specific set of associated data.
 
 == Usage
 
-DataGraph uses a syntax based on the serialization methods.
+DataGraph selects data using a syntax based on the serialization methods.
 
   require 'data_graph'
   graph = Model.data_graph(
