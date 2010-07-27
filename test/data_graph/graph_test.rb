@@ -25,16 +25,17 @@ class GraphTest < Test::Unit::TestCase
   end
   
   def test_initialize_may_define_new_aliases
-    graph = Graph.new(node, :aliases => {'name_only' => %w{first_name last_name}})
-    assert_equal %w{first_name last_name}, graph.aliases['name_only']
+    name_columns = %w{first_name last_name}
+    
+    graph = Graph.new(node, :aliases => {'name_only' => name_columns})
+    assert_equal name_columns, graph.aliases['name_only']
   end
   
   def test_initialize_registers_subsets
     name_columns = %w{first_name last_name}
     
     graph = Graph.new(node, :subsets => {'name_only' => name_columns})
-    assert_equal name_columns, graph.paths['name_only']
-    assert_equal name_columns, graph.subsets['name_only'].node.paths
+    assert_equal name_columns, graph.subsets['name_only'].paths
   end
   
   #
@@ -61,13 +62,10 @@ class GraphTest < Test::Unit::TestCase
   #
   
   def test_register_registers_paths_and_creates_a_subset
-    assert_equal nil, graph.paths[:type]
     assert_equal nil, graph.subsets[:type]
     
     graph.register(:type, %w{first_name last_name})
-    
-    assert_equal %w{first_name last_name}, graph.paths[:type]
-    assert_equal %w{first_name last_name}, graph.subsets[:type].node.paths
+    assert_equal %w{first_name last_name}, graph.subsets[:type].paths
   end
   
   def test_register_returns_subset_graph
@@ -88,7 +86,7 @@ class GraphTest < Test::Unit::TestCase
     assert_equal %w{
       first_name
       last_name
-    }, subset.node.paths
+    }, subset.paths
   end
   
   #
@@ -108,6 +106,6 @@ class GraphTest < Test::Unit::TestCase
       dept_id
       manager_id
       salary
-    }, subset.node.paths
+    }, subset.paths
   end
 end

@@ -81,18 +81,6 @@ module DataGraph
       paths
     end
     
-    def aliases
-      aliases = {'*' => column_names.dup}
-      
-      linkages.each_pair do |name, linkage|
-        linkage.node.aliases.each_pair do |als, paths|
-          aliases["#{name}.#{als}"] = paths.collect {|path| "#{name}.#{path}" }
-        end
-      end
-      
-      aliases
-    end
-    
     def nest_paths
       paths = []
       
@@ -107,6 +95,18 @@ module DataGraph
       end
       
       paths
+    end
+    
+    def aliases
+      aliases = {'*' => column_names.dup}
+      
+      linkages.each_pair do |name, linkage|
+        linkage.node.aliases.each_pair do |als, paths|
+          aliases["#{name}.#{als}"] = paths.collect {|path| "#{name}.#{path}" }
+        end
+      end
+      
+      aliases
     end
     
     def options

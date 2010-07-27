@@ -12,18 +12,12 @@ module DataGraph
     # The graph node
     attr_reader :node
     
-    # A hash of named path sets resolved against aliases.
-    attr_reader :paths
-    
-    # A hash of named subsets that mirror the named paths.
+    # A hash of registered (type, Node) subsets
     attr_reader :subsets
     
     def initialize(node, options={})
       @node = node
-      @aliases = nil
-      @nest_paths = nil
-      @subsets = {}
-      @paths   = {}
+      @subsets = {:default => self}
       
       if aliases = options[:aliases]
         @aliases = node.aliases.merge(aliases)
@@ -36,18 +30,33 @@ module DataGraph
       end
     end
     
-    # Returns a hash of aliases defined for the node (ie node.aliases).
+    # Returns the node paths
+    def paths
+      @paths ||= node.paths
+    end
+    
+    # Returns the node get_paths
+    def get_paths
+      @get_paths ||= node.get_paths
+    end
+    
+    # Returns the node set_paths
+    def set_paths
+      @set_paths ||= node.set_paths
+    end
+    
+    # Returns the node nest_paths
+    def nest_paths
+      @nest_paths ||= node.nest_paths
+    end
+    
+    # Returns the node aliases
     #
     # Non-default aliases may be defined during initialization, but afterwards
     # aliases should not be modified so as to ensure consistency of resolved
     # paths and subsets.
     def aliases
       @aliases ||= node.aliases
-    end
-    
-    # Returns an array of nestable paths.
-    def nest_paths
-      @nest_paths ||= node.nest_paths
     end
     
     # Delegates to Node#find.
@@ -80,27 +89,22 @@ module DataGraph
     
     # Register a new named path/subset.
     def register(type, paths)
-      resolved_paths = resolve(paths)
-      self.paths[type] = resolved_paths
-      self.subsets[type] = only(resolved_paths)
+      if paths.nil?
+        subsets.delete(type)
+      else
+        subsets[type] = only(paths)
+      end
     end
     
-    # Returns the named paths.  Raises an error if no such subset exists.
-    def path(type)
-      paths[type] or raise "no such path: #{type.inspect}"
-    end
-    
-    # Returns the named subset, or the default subset if the named subset does
-    # not exist.  Raises an error if neither subset exists.
-    def subset(type, default_type = :default)
-      (subsets[type] || subsets[default_type]) or raise "no such subset: #{type.inspect}"
+    def subset(type)
+      (subsets[type] || subsets[:default]) or raise "no such subset: #{type.inspect}"
     end
     
     # Validates that the paths are all accessible by the named paths.  The
     # input paths are not resolved against aliases.  Raises an
     # InaccessiblePathError if the paths are not accessible.
     def validate(type, paths)
-      inaccessible_paths = paths - path(type)
+      inaccessible_paths = paths - subset(type).paths
       unless inaccessible_paths.empty?
         raise InaccessiblePathError.new(inaccessible_paths)
       end
