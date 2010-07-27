@@ -12,9 +12,13 @@ module DataGraph
     # The graph node
     attr_reader :node
     
-    # A hash of registered (type, Node) subsets
+    # A hash of registered (type, Node) subsets.  The :default subset points
+    # to self by default, but may be unregistered with nil or with a different
+    # set of paths.
     attr_reader :subsets
     
+    # Initializes a new Graph.  Options can provide :alisas and :subsets.  The aliases
+    # are merged with the default node aliases, and each subset is registered with self.
     def initialize(node, options={})
       @node = node
       @subsets = {:default => self}
@@ -50,11 +54,7 @@ module DataGraph
       @nest_paths ||= node.nest_paths
     end
     
-    # Returns the node aliases
-    #
-    # Non-default aliases may be defined during initialization, but afterwards
-    # aliases should not be modified so as to ensure consistency of resolved
-    # paths and subsets.
+    # Returns the node aliases.
     def aliases
       @aliases ||= node.aliases
     end
@@ -87,7 +87,8 @@ module DataGraph
       paths
     end
     
-    # Register a new named path/subset.
+    # Registers a new subset defined by only(paths) and returns the new
+    # subset.  Provide nil paths to unregister and return an existing subset.
     def register(type, paths)
       if paths.nil?
         subsets.delete(type)
@@ -96,25 +97,35 @@ module DataGraph
       end
     end
     
+    # Returns the specified subset, or the default subset if no subset is
+    # registered to type.  Raises an error if neither subset is registered.
     def subset(type)
       (subsets[type] || subsets[:default]) or raise "no such subset: #{type.inspect}"
     end
     
-    # Validates that the paths are all accessible by the named paths.  The
+    # Validates that the paths are all accessible by the named subset.  The
     # input paths are not resolved against aliases.  Raises an
     # InaccessiblePathError if the paths are not accessible.
     def validate(type, paths)
-      inaccessible_paths = paths - subset(type).paths
+      inaccessible_paths = paths - subset(type).get_paths
       unless inaccessible_paths.empty?
         raise InaccessiblePathError.new(inaccessible_paths)
       end
+      
       paths
     end
     
-    # Validates that all paths in the attrs hash are assignable, as per the
-    # named paths.  Nested attr paths are resolved against nest_paths.
+    # Validates that all paths in the attrs hash are assignable by the named
+    # subset.  The input paths are not resolved against aliases.  Raises an
+    # InaccessiblePathError if the paths are not accessible.
     def validate_attrs(type, attrs)
-      validate(type, patherize_attrs(attrs, nest_paths))
+      paths = patherize_attrs(attrs, nest_paths)
+      
+      inaccessible_paths = paths - subset(type).set_paths
+      unless inaccessible_paths.empty?
+        raise InaccessiblePathError.new(inaccessible_paths)
+      end
+      
       attrs
     end
   end
@@ -125,7 +136,7 @@ module DataGraph
     
     def initialize(paths)
       @paths = paths
-      super "inaccesible: #{paths.inspect}"
+      super "inaccessible: #{paths.inspect}"
     end
   end
 end

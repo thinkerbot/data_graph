@@ -145,4 +145,35 @@ class UtilsTest < Test::Unit::TestCase
       c.f.h
     }, patherize_attrs(attrs, nest_paths).sort
   end
+  
+  def test_patherize_attrs_also_works_with_array_of_nested_paths
+    attrs = {
+      :a => 1,
+      :b => 2,
+      :c => [
+        {:d => 3},
+        {:e => 4},
+        {
+          :f => [
+            {:g => 5},
+            {:h => 6}
+          ]
+        }
+      ]
+    }
+    
+    nest_paths = %w{
+      c
+      c.f
+    }
+    
+    assert_equal %w{
+      a
+      b
+      c.d
+      c.e
+      c.f.g
+      c.f.h
+    }, patherize_attrs(attrs, nest_paths).sort
+  end
 end

@@ -35,7 +35,7 @@ module DataGraph
         when String, Symbol
           path = "#{prefix}#{key}"
           
-          if nest_paths.include?(path)
+          if nest_paths.include?(path) && value.kind_of?(Hash)
             value = value.values
           end
           
