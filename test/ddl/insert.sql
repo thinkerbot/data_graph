@@ -25,3 +25,14 @@ insert into emps values (11, 'Tom',      'Turner', 5, 3, 5,    1500);
 insert into emps values (12, 'Abe',      'Adams',  4, 2, 10,   1100);
 insert into emps values (13, 'Joan',     'James',  4, 3, 5,    950);
 insert into emps values (14, 'Michelle', 'Miller', 4, 1, 9,    1300);
+
+insert into products values (1, 'Product One');
+insert into products values (2, 'Product Two');
+
+insert into tariffs values (1, date('2010-09-08'), 50);
+insert into tariffs values (2, date('2010-09-08'), 0);
+insert into tariffs values (1, date('2010-09-09'), 100);
+
+insert into product_tariffs values (1, 1, date('2010-09-08'));
+insert into product_tariffs values (1, 2, date('2010-09-08'));
+insert into product_tariffs values (2, 2, date('2010-09-08'));

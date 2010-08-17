@@ -1,6 +1,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 require 'data_graph/node'
 require 'emp'
+require 'product'
 
 class NodeTest < Test::Unit::TestCase
   Node = DataGraph::Node
@@ -303,6 +304,18 @@ class NodeTest < Test::Unit::TestCase
     assert_equal 1, emp.id
     assert_equal 'Kim', emp.first_name
     assert_raises(ActiveRecord::MissingAttributeError) { emp.last_name }
+  end
+  
+  #
+  # cpk hmt test
+  #
+  
+  def test_find_for_cpk_hmt
+    tariffs = Product.find(1).tariffs.collect {|tariff| tariff.amount }
+    assert_equal [50, 0], tariffs
+    
+    tariffs = Product.data_graph(:include => :tariffs).find(1).tariffs.collect {|tariff| tariff.amount }
+    assert_equal [50, 0], tariffs
   end
   
   #

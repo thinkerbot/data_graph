@@ -8,6 +8,7 @@ $:.unshift File.expand_path('../../test/models', __FILE__)
 
 require 'data_graph'
 require 'job'
+require 'product'
 require 'irb'
 
 ActiveRecord::Base.logger = Logger.new(StringIO.new)
