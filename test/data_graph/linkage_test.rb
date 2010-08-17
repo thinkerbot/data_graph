@@ -1,6 +1,5 @@
 require File.expand_path('../../test_helper', __FILE__)
 require 'data_graph/linkage'
-require 'emp'
 
 class LinkageTest < Test::Unit::TestCase
   Linkage = DataGraph::Linkage
@@ -136,6 +135,68 @@ class LinkageTest < Test::Unit::TestCase
     assert_equal true, b.hmt.loaded?
     
     assert_equal([10, 20], a.hmt.collect {|three| three.id })
+    assert_equal [], b.hmt
+  end
+  
+  class CpkHmtOne < ActiveRecord::Base
+    set_table_name 'one'
+    has_many :hm, :class_name => 'LinkageTest::CpkHmtTwo', :foreign_key => :one_id
+    has_many :hmt, :through => :hm, :source => :bt
+  end
+
+  class CpkHmtTwo < ActiveRecord::Base
+    set_table_name 'two'
+    set_primary_keys 'one_id', 'three_a', 'three_b'
+    belongs_to :bt, :class_name => 'LinkageTest::CpkHmtThree', :foreign_key => [:three_a, :three_b]
+  end
+  
+  class CpkHmtThree < ActiveRecord::Base
+    set_table_name 'three'
+    set_primary_keys 'a', 'b'
+  end
+  
+  def test_link_for_cpk_hmt
+    fixture %q{
+      create table one (
+        id number, 
+        primary key (id)
+      );
+      create table two (
+        one_id number, 
+        three_a number, 
+        three_b number, 
+        primary key (one_id, three_a, three_b)
+      );
+      create table three (
+        a number, 
+        b number, 
+        primary key (a, b)
+      );
+      
+      insert into one values (1);
+      insert into one values (2);
+      insert into two values (1, 10, 100);
+      insert into two values (1, 20, 100);
+      insert into two values (3, 30, 100);
+      insert into three values (10, 100);
+      insert into three values (20, 100);
+      insert into three values (30, 100);
+    }, %q{
+      drop table three;
+      drop table two;
+      drop table one;
+    }
+    
+    a, b = CpkHmtOne.find(1), CpkHmtOne.find(2)
+    assert_equal false, a.hmt.loaded?
+    assert_equal false, b.hmt.loaded?
+    
+    linkage(CpkHmtOne, :hmt).link([a,b])
+    
+    assert_equal true, a.hmt.loaded?
+    assert_equal true, b.hmt.loaded?
+    
+    assert_equal([10, 20], a.hmt.collect {|three| three.a })
     assert_equal [], b.hmt
   end
   
