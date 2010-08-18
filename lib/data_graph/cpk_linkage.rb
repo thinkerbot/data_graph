@@ -3,11 +3,11 @@ require 'data_graph/linkage'
 module DataGraph
   class CpkLinkage < Linkage
     def parent_id(record)
-      parent_columns.collect {|attribute| record.read_attribute(attribute) }
+      parent_columns.collect {|attribute| record.read_attribute_before_type_cast(attribute) }
     end
     
     def child_id(record)
-      child_columns.collect {|attribute| record.read_attribute(attribute) }
+      child_columns.collect {|attribute| record.read_attribute_before_type_cast(attribute) }
     end
     
     def conditions(id_map)
