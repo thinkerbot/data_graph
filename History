@@ -1,3 +1,7 @@
+== 1.0.2 2010/08/18
+
+* updated dependencies to allow upgrade to 2.3.8
+
 == 1.0.1 2010/08/18
 
 * fixed bug whereby cpk records would not be linked during find
