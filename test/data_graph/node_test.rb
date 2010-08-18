@@ -133,6 +133,16 @@ class NodeTest < Test::Unit::TestCase
     assert_equal "only and except are both specified: #{node.inspect}", err.message
   end
   
+  class DefineAttributeMethodsClass < ActiveRecord::Base
+    set_table_name 'jobs'
+  end
+  
+  def test_initialize_define_attribute_methods
+    assert_equal false, DefineAttributeMethodsClass.generated_methods?
+    Node.new(DefineAttributeMethodsClass)
+    assert_equal true, DefineAttributeMethodsClass.generated_methods?
+  end
+  
   #
   # get_paths test
   #

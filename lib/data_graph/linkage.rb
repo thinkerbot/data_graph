@@ -47,11 +47,11 @@ module DataGraph
     end
     
     def parent_id(record)
-      record.send parent_columns.at(0)
+      record.read_attribute parent_columns.at(0)
     end
     
     def child_id(record)
-      record.send child_columns.at(0)
+      record.read_attribute child_columns.at(0)
     end
     
     def conditions(id_map)

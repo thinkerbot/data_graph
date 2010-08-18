@@ -14,6 +14,19 @@ module DataGraph
     
     def initialize(model, options={})
       @model = model
+      
+      # Attribute methods need to be defined because later on the Linkage
+      # parent_id/child_id methods call read_attribute to extract keys for
+      # associating child records to parents.  As a result AR will pretend
+      # like attribute methods do not need to be generated for the key fields.
+      # Way down the line send(:attribute) and methods that depend on it,
+      # including to_json, end up breaking as a result.
+      #
+      # Consider it a lesson in being too smart with method_missing.
+      if !model.generated_methods?
+        model.define_attribute_methods
+      end
+      
       self.options = options
     end
     

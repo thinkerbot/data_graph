@@ -1,7 +1,7 @@
 require 'product_tariff'
 
 class Product < ActiveRecord::Base
-  set_primary_key :id
+  set_primary_keys :id
   
   has_many :product_tariffs, 
     :foreign_key => :product_id
