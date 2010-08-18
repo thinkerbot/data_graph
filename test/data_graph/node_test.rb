@@ -241,8 +241,12 @@ class NodeTest < Test::Unit::TestCase
       job_attributes.id
       job_attributes.name
       job_attributes._destroy
-      job_attributes._delete
     }
+    
+    # _delete is deprecated at 2.3.5 and removed at 2.3.8
+    if Gem.loaded_specs['activerecord'].version.to_s == '2.3.5'
+      expected << 'job_attributes._delete'
+    end
     
     assert_equal expected, node.set_paths
   end

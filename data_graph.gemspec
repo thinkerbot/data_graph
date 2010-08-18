@@ -16,8 +16,8 @@ Gem::Specification.new do |s|
   s.rdoc_options.concat %W{--main README -S -N --title Data\ Graph}
   
   # add dependencies
-  s.add_dependency('activerecord', '= 2.3.5')
-  s.add_dependency('composite_primary_keys', '= 2.3.5.1')
+  s.add_dependency('activerecord', '~> 2.3.5')
+  s.add_dependency('composite_primary_keys', '~> 2.3.5')
   s.add_development_dependency('sqlite3-ruby', '~> 1.2.5')
   
   # list extra rdoc files here.
