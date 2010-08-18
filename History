@@ -1,3 +1,7 @@
+== 1.0.1 2010/08/18
+
+* fixed bug whereby cpk records would not be linked during find
+
 == 1.0.0 2010/07/20
 
 Initial public release.
