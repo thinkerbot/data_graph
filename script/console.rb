@@ -10,8 +10,23 @@ require 'data_graph'
 require 'job'
 require 'product'
 require 'irb'
+require 'optparse'
 
-ActiveRecord::Base.logger = Logger.new(StringIO.new)
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: ruby script/console.rb [options]"
+
+  opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+    options[:verbose] = v
+  end
+  
+  opts.on_tail("-h", "--help", "Print Help") do |v|
+    puts opts
+    exit
+  end
+end.parse!
+
+ActiveRecord::Base.logger = Logger.new(options[:verbose] ? STDOUT : StringIO.new)
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
 
 connection = ActiveRecord::Base.connection.raw_connection
