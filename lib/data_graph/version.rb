@@ -1,7 +1,7 @@
 module DataGraph
   MAJOR = 1
   MINOR = 0
-  TINY = 2
+  TINY  = 3
 
-  VERSION="#{MAJOR}.#{MINOR}.#{TINY}"
+  VERSION = "#{MAJOR}.#{MINOR}.#{TINY}"
 end

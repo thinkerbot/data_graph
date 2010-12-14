@@ -1,3 +1,7 @@
+== 1.0.3 2010/12/14
+
+* fix queries on parent tables with no entries [IAPTECH-6] 
+
 == 1.0.2 2010/08/18
 
 * updated dependencies to allow upgrade to 2.3.8
