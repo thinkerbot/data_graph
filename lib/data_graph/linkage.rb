@@ -59,9 +59,10 @@ module DataGraph
     end
     
     def link(parents)
-      id_map = Hash.new {|hash, key| hash[key] = [] }
-      
       parents = arrayify(parents)
+      return [] if parents.empty?
+      
+      id_map = Hash.new {|hash, key| hash[key] = [] }
       parents.each do |parent|
         id_map[parent_id(parent)] << parent
       end
