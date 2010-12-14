@@ -104,6 +104,51 @@ class DataGraphTest < Test::Unit::TestCase
     ], ActiveSupport::JSON.decode(json)
   end
   
+  def test_data_graphs_return_parents_if_child_table_has_no_entries
+    fixture %q{
+      create table one (
+        a number, 
+        b number, 
+        p number,
+        primary key(a, b)
+      );
+      
+      create table two (
+        x number, 
+        y number, 
+        q number,
+        primary key(q)
+      );
+      
+      insert into one values (1, 1, 1);
+      insert into one values (1, 2, 2);
+      insert into one values (2, 1, 3);
+    }, %q{
+      drop table two;
+      drop table one;
+    }
+
+    opts = {
+      :only => ['p'], 
+      :include => {
+        :cpk_two => {
+          :only => ['q']
+        },
+        :cpk_twos => {
+          :only => ['q']
+        }
+      }
+    }
+    
+    json = CpkOne.data_graph(opts).find(:all).to_json(opts)
+    
+    assert_equal [
+      { 'p' => 1, 'cpk_twos' => []},
+      { 'p' => 2, 'cpk_twos' => []},
+      { 'p' => 3, 'cpk_twos' => []}
+    ], ActiveSupport::JSON.decode(json)
+  end
+  
   def test_data_graphs_return_no_results_if_parent_table_has_no_entries
     fixture %q{
       create table one (
@@ -119,6 +164,10 @@ class DataGraphTest < Test::Unit::TestCase
         q number,
         primary key(q)
       );
+      
+      insert into two values (1, 1, 3);
+      insert into two values (1, 2, 2);
+      insert into two values (2, 1, 1);
     }, %q{
       drop table two;
       drop table one;
